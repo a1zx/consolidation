@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Credit Consolidation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900;700;500;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main: #a182c9;
+      --main2: #e6cafb;
+      --bg: #fafbfe;
+      --sel: #f8d6f9;
+      --sel2: #f3d0ea;
+      --gradient: linear-gradient(90deg,#a182c9 0%, #e6cafb 100%);
+    }
+    html, body {
+      background: var(--bg);
+      min-height: 100vh; margin:0; padding:0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: #484868;
+      overflow-x: hidden;
+      position: relative;
+    }
+    body {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 0 0 36px 0;
+      position: relative;
+      z-index: 2;
+    }
+    /* Декоративные фигуры вокруг */
+    .decors {
+      pointer-events: none;
+      position: fixed;
+      z-index: 0;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .decor-circle {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.45;
+      z-index: 0;
+      pointer-events: none;
+      transition: opacity .4s;
+    }
+    .decor1 { width: 180px; height: 180px; left: -70px; top: -60px; background: #e6cafb;}
+    .decor2 { width: 110px; height: 110px; right: -35px; top: 36px; background: #c9bdf7;}
+    .decor3 { width: 170px; height: 170px; left: -65px; bottom: 0px; background: #c6f6e5;}
+    .decor4 { width: 130px; height: 130px; right: -55px; bottom: -55px; background: #c693d3;}
+    .decor5 { width: 60px; height: 60px; right: 45px; bottom: 120px; background: #f5e2fd;}
+    .decor6 { width: 60px; height: 60px; left: 70px; top: 80px; background: #c6d7f6;}
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 26px;
+      margin-bottom: 14px;
+      z-index: 3;
+      position: relative;
+    }
+    .avatar {
+      width: 37px; height: 37px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #d3bae2;
+    }
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      color: #7d68a7;
+      margin-right: 8px;
+    }
+    .plus {
+      color: #a182c9;
+      font-size: 2.4rem;
+      margin-left: auto;
+      font-weight: 500;
+      line-height: 1;
+      user-select: none;
+      cursor: pointer;
+      opacity: 0.8;
+      margin-right: 6px;
+    }
+    /* CREDITS LIST */
+    .loans-list-wrap {
+      position: relative;
+      z-index: 2;
+    }
+    .loans-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 25px;
+      margin-top: 4px;
+      position: relative;
+      z-index: 2;
+      min-height: 230px;
+    }
+    .loan {
+      background: #fff;
+      border-radius: 16px;
+      padding: 19px 18px 14px 18px;
+      box-shadow: 0 2px 13px #c5a8e522;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      border: 2px solid #fff0;
+      transition: background .17s, border .15s, transform .23s cubic-bezier(.63,1.35,.49,1.07);
+      position: relative;
+      cursor: pointer;
+      min-height: 62px;
+      user-select: none;
+      z-index: 2;
+      opacity: 1;
+      will-change: transform, opacity;
+    }
+    .loan.selected, .loan.selected-anim {
+      background: var(--sel);
+      border: 2.2px solid var(--main);
+      box-shadow: 0 2px 17px #ce9af855;
+    }
+    .loan.selected-anim {
+      animation: selectanim .18s;
+    }
+    @keyframes selectanim {
+      0% { background: #f0e1f8; }
+      100% { background: var(--sel); }
+    }
+    .loan .top {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 1.08em;
+    }
+    .loan-title { max-width: 62vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+    .loan-amount {
+      font-size: 1.22em;
+      font-weight: 800;
+      display: flex; align-items: center; gap: 2px;
+      color: #5e467e;
+      letter-spacing: .02em;
+    }
+    .shrek {
+      width: 21px; height: 21px;
+      margin-left: 2px; vertical-align: middle;
+      filter: drop-shadow(0 1.5px 6px #e0c64c65);
+    }
+    .loan .bottom {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      font-size: .97em;
+      margin-top: 5px;
+      color: #9899ac;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+    .consolidate-btn {
+      width: 100%;
+      padding: 17px 0;
+      font-size: 1.22rem;
+      font-weight: 900;
+      border: none;
+      border-radius: 13px;
+      margin: 19px 0 13px 0;
+      background: linear-gradient(90deg, #c693d3 0%, #e8cafb 100%);
+      color: #fff;
+      box-shadow: 0 4px 18px #d0b1ef33;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: background .18s, opacity .13s;
+      z-index: 2;
+      position: relative;
+    }
+    .consolidate-btn:active { opacity: .87;}
+    /* MODAL ANIMATION */
+    .result-modal-bg {
+      position: fixed;
+      z-index: 22;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(85,65,122,0.14);
+      backdrop-filter: blur(2.2px);
+      display: flex; align-items: center; justify-content: center;
+      animation: fadein .22s;
+    }
+    @keyframes fadein { from{ opacity:0;} to{ opacity:1; } }
+    .result-modal {
+      background: #fff;
+      border-radius: 22px;
+      padding: 43px 16px 31px 16px;
+      box-shadow: 0 7px 29px #c5a8e585;
+      min-width: 0; max-width: 390px; width: 92vw;
+      display: flex; flex-direction: column; align-items: center;
+      animation: modalpop .42s cubic-bezier(.62,1.45,.56,1.04);
+    }
+    @keyframes modalpop {
+      0% {transform: translateY(40px) scale(.93); opacity: 0;}
+      60%{transform: translateY(-14px) scale(1.04);}
+      100% {transform: translateY(0) scale(1);}
+    }
+    .result-title {
+      font-size: 1.37em;
+      font-weight: 900;
+      margin-bottom: 21px;
+      background: linear-gradient(90deg,#a182c9 0%, #6cd0a0 100%);
+      background-clip: text; -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; text-fill-color: transparent;
+      text-align: center;
+      letter-spacing: 0.03em;
+      margin-top: -6px;
+    }
+    .result-list {
+      margin-top: 2px;
+      margin-bottom: 6px;
+      color: #484868;
+      font-size: 1.13em;
+      font-weight: 600;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .result-list .row {
+      display: flex; align-items: flex-start; gap: 9px;
+    }
+    .result-list .row .ok {
+      color: #24bc6b; font-size: 1.3em; margin-right: 2px;
+      font-weight: bold;
+    }
+    .result-list .shrek {
+      width: 22px; height: 22px; margin-left: 2px; filter: drop-shadow(0 1.5px 6px #e0c64c65);
+    }
+    /* Анимация объединения */
+    .loan.merge-up { animation: mergeup .47s cubic-bezier(.44,1.2,.45,1.07) forwards;}
+    .loan.merge-down { animation: mergedown .47s cubic-bezier(.44,1.2,.45,1.07) forwards;}
+    .loan.merge-center { animation: mergecenter .55s cubic-bezier(.52,1.4,.5,1.05) forwards;}
+    @keyframes mergeup {
+      0%{z-index:2;}
+      45%{transform: translateY(-45px) scaleY(.98) scaleX(1.01);}
+      100%{transform: translateY(-55px) scaleY(.92) scaleX(1.02); opacity:.1;}
+    }
+    @keyframes mergedown {
+      0%{z-index:2;}
+      45%{transform: translateY(45px) scaleY(.98) scaleX(1.01);}
+      100%{transform: translateY(55px) scaleY(.92) scaleX(1.02); opacity:.1;}
+    }
+    @keyframes mergecenter {
+      0%{z-index:2;}
+      60%{transform: scaleX(1.08) scaleY(1.11);}
+      100%{transform: scaleX(1.22) scaleY(1.18); opacity:0;}
+    }
+    /* Декоративные и адаптив */
+    @media (max-width:500px){
+      body{padding:0;}
+      .result-modal{padding:26px 4vw 21px 4vw;}
+      .loan-title{max-width:54vw;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Декорации вокруг -->
+  <div class="decors">
+    <div class="decor-circle decor1"></div>
+    <div class="decor-circle decor2"></div>
+    <div class="decor-circle decor3"></div>
+    <div class="decor-circle decor4"></div>
+    <div class="decor-circle decor5"></div>
+    <div class="decor-circle decor6"></div>
+  </div>
+  <div class="header">
+    <img class="avatar" src="https://randomuser.me/api/portraits/women/65.jpg" alt="Avatar">
+    <div class="title">Credits</div>
+    <div class="plus">+</div>
+  </div>
+  <div class="loans-list-wrap">
+    <div class="loans-list" id="loansList"></div>
+    <button class="consolidate-btn" id="consolidateBtn">Consolidate</button>
+  </div>
+  <div id="modalResult" style="display:none"></div>
+  <script>
+    // Логотип Шрека
+    const shrek = `<img src="https://i.ibb.co/ymsQZgKz/gratis-png-shrek-la-serie-musical-de-shrek-pelicula-logo-animacion-shrek-thumbnail.png" class="shrek" alt="$">`;
+
+    // Кредиты
+    let loans = [
+      {
+        name: "Student loan",
+        amount: 6000,
+        date: "01.01.2025",
+        rate: 6.8,
+      },
+      {
+        name: "Microcredit",
+        amount: 8000,
+        date: "17.06.2025",
+        rate: 18.5,
+      },
+      {
+        name: "Bank loan",
+        amount: 12000,
+        date: "12.05.2025",
+        rate: 11.9,
+      }
+    ];
+    let selected = [false, false, false];
+    let animating = false;
+
+    function renderLoans(mergeIdxs = null) {
+      const list = document.getElementById('loansList');
+      list.innerHTML = '';
+      loans.forEach((loan, i) => {
+        const card = document.createElement('div');
+        card.className = 'loan' + (selected[i] ? ' selected' : '');
+        card.innerHTML = `
+          <div class="top">
+            <span class="loan-title">${loan.name}</span>
+            <span class="loan-amount">${loan.amount}${shrek}</span>
+          </div>
+          <div class="bottom">
+            <span>${loan.date}</span>
+            <span>${loan.rate}%</span>
+          </div>
+        `;
+        if (mergeIdxs && mergeIdxs.includes(i)) {
+          if (i < mergeIdxs[0]) card.classList.add('merge-up');
+          else if (i > mergeIdxs[mergeIdxs.length-1]) card.classList.add('merge-down');
+          else card.classList.add('merge-center');
+        }
+        card.onclick = e => {
+          if(animating) return;
+          selected[i] = !selected[i];
+          card.classList.add("selected-anim");
+          setTimeout(() => {
+            renderLoans();
+          }, 130);
+        };
+        list.appendChild(card);
+      });
+    }
+    renderLoans();
+
+    document.getElementById('consolidateBtn').onclick = function() {
+      if(animating) return;
+      const selIdxs = loans.map((_,i)=>i).filter(i=>selected[i]);
+      if(selIdxs.length === 0) {
+        document.getElementById('loansList').style.animation = "shake .17s";
+        setTimeout(()=>{ document.getElementById('loansList').style.animation = ""; }, 180);
+        return;
+      }
+      animating = true;
+      // Анимация объединения
+      renderLoans(selIdxs);
+      setTimeout(()=>{
+        // Считаем новый кредит
+        let sel = selIdxs.map(i=>loans[i]);
+        let total = sel.reduce((s, l) => s + l.amount, 0);
+        let minRate = Math.min(...sel.map(l => l.rate));
+        let newRate = Math.max((minRate-1).toFixed(1), 3.5);
+        // Прячем старые (чтобы не дёргалось)
+        document.getElementById('loansList').innerHTML = "";
+        // Показываем результат
+        showResult(total, newRate);
+      }, 550); // время длительности merge анимации
+    };
+
+    // Модалка результат
+    function showResult(sum, rate) {
+      const modal = document.getElementById('modalResult');
+      modal.innerHTML = `
+        <div class="result-modal-bg">
+          <div class="result-modal">
+            <div class="result-title">Consolidation successful</div>
+            <div class="result-list">
+              <div class="row"><span class="ok">✔️</span> Consolidated credit — <b>${sum}${shrek}</b></div>
+              <div class="row"><span class="ok">✔️</span> New interest rate — <b>${rate}% APR</b></div>
+              <div class="row"><span class="ok">✔️</span> Single simple monthly payment</div>
+            </div>
+          </div>
+        </div>
+      `;
+      modal.style.display = "flex";
+      setTimeout(()=>{ 
+        modal.style.display = "none"; 
+        // сбрасываем выделение
+        selected = selected.map(()=>false);
+        renderLoans();
+        animating = false;
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
